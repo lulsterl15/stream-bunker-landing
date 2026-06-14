@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+<title>Masters Battle Arena</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+
+  --gold:#D4AF37;--gold-dim:#8B7320;
+
+  --red:#C0392B;--red-dim:#7B241C;
+
+  --bg:#0a0806;--ui-bg:#110e08;
+
+  --border:#2e2a1e;--text:#c8b890;--text-dim:#7a6a48;
+
+  --panel:#1a1508;
+
+}
+
+html,body{background:var(--bg);overflow:hidden;height:100%;
+
+  user-select:none;-webkit-tap-highlight-color:transparent;
+
+  font-family:'Cinzel',serif;color:var(--text)}
+
+/* ── SCREENS ── */
+
+.screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100;background:var(--bg)}
+
+.screen.hidden{display:none}
+
+/* ── AUTH SCREEN ── */
+
+#auth-screen{flex-direction:column;gap:20px;padding:20px}
+
+.auth-box{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:32px;width:100%;max-width:380px}
+
+.auth-title{font-size:22px;color:var(--gold);text-align:center;margin-bottom:6px;letter-spacing:.1em}
+
+.auth-sub{font-size:11px;color:var(--text-dim);text-align:center;margin-bottom:24px;letter-spacing:.08em}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+
+.field label{font-size:9px;color:var(--text-dim);letter-spacing:.12em}
+
+.field input{background:#0e0c07;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:2px;font-family:'Crimson Text',serif;font-size:14px;outline:none}
+
+.field input:focus{border-color:var(--gold-dim)}
+
+.btn-gold{background:var(--gold-dim);border:1px solid var(--gold);color:var(--gold);padding:11px;border-radius:2px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.1em;cursor:pointer;width:100%;transition:all .15s}
+
+.btn-gold:hover{background:var(--gold);color:#0a0806}
+
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text-dim);padding:9px;border-radius:2px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;cursor:pointer;width:100%;margin-top:8px;transition:all .15s}
+
+.btn-ghost:hover{border-color:var(--gold-dim);color:var(--text)}
+
+.auth-error{font-size:11px;color:#e74c3c;text-align:center;margin-top:8px;min-height:16px}
+
+/* ── MASTER SELECT SCREEN ── */
+
+#master-screen{flex-direction:column;gap:16px;padding:20px}
+
+.master-title{font-size:20px;color:var(--gold);letter-spacing:.12em;text-align:center}
+
+.master-sub{font-size:10px;color:var(--text-dim);letter-spacing:.1em;text-align:center}
+
+.masters-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;width:100%;max-width:480px}
+
+.master-card{background:var(--panel);border:1.5px solid var(--border);border-radius:4px;padding:20px 16px;cursor:pointer;transition:all .15s;text-align:center}
+
+.master-card:hover{border-color:var(--gold-dim)}
+
+.master-card.sel{border-color:var(--gold);background:#1e1808}
+
+.master-icon{font-size:36px;margin-bottom:10px}
+
+.master-name{font-size:13px;color:var(--gold);letter-spacing:.08em;margin-bottom:4px}
+
+.master-desc{font-size:10px;color:var(--text-dim);margin-bottom:10px}
+
+.master-stats{display:flex;gap:8px;justify-content:center}
+
+.stat{font-size:9px;color:var(--text-dim);background:#0e0c07;padding:3px 7px;border-radius:2px}
+
+.stat span{color:var(--gold)}
+
+/* ── ARENA LAYOUT ── */
+
+#arena-screen{flex-direction:column;background:var(--bg)}
+
+#arena-screen.hidden{display:none}
+
+#arena-top{height:48px;background:var(--ui-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:12px;flex-shrink:0}
+
+.player-hud{display:flex;align-items:center;gap:8px;flex:1}
+
+.hud-icon{font-size:20px}
+
+.hud-info{display:flex;flex-direction:column;gap:1px}
+
+.hud-name{font-size:9px;color:var(--gold);letter-spacing:.08em}
+
+.health-bar{width:80px;height:6px;background:#1a1a1a;border-radius:3px;overflow:hidden}
+
+.health-fill{height:100%;background:var(--red);transition:width .4s;border-radius:3px}
+
+.hud-hp{font-size:8px;color:var(--text-dim)}
+
+.turn-badge{font-size:9px;color:var(--gold);border:1px solid var(--gold-dim);padding:3px 10px;border-radius:2px;letter-spacing:.08em;white-space:nowrap}
+
+#arena-map{flex:1;position:relative;overflow:hidden}
+
+#stage-mount{position:absolute;inset:0}
+
+#arena-hud{position:absolute;top:8px;left:8px;pointer-events:none;background:rgba(10,8,6,.88);border:1px solid var(--border);color:var(--text-dim);font-size:9px;letter-spacing:.08em;padding:4px 12px;border-radius:2px;z-index:10}
+
+#arena-toast{position:absolute;top:10px;left:50%;transform:translateX(-50%);pointer-events:none;background:rgba(10,8,6,.93);color:var(--gold);font-size:11px;letter-spacing:.05em;padding:6px 16px;border-radius:2px;border:1px solid var(--gold-dim);white-space:nowrap;z-index:20;opacity:0;transition:opacity .25s}
+
+#arena-toast.show{opacity:1}
+
+#zoom-btns{position:absolute;bottom:10px;right:10px;display:flex;flex-direction:column;gap:4px;z-index:10}
+
+.zbtn{width:38px;height:38px;border-radius:2px;border:1px solid var(--border);background:rgba(10,8,6,.9);color:var(--text-dim);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s}
+
+.zbtn:hover{border-color:var(--gold-dim);color:var(--gold)}
+
+#arena-panel{height:68px;background:var(--ui-bg);border-top:1px solid var(--border);display:flex;align-items:center;gap:6px;padding:0 10px;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+
+#arena-panel::-webkit-scrollbar{display:none}
+
+.panel-btn{display:flex;align-items:center;gap:5px;padding:6px 11px;border:1px solid var(--border);background:var(--panel);color:var(--text-dim);font-size:10px;letter-spacing:.05em;cursor:pointer;white-space:nowrap;flex-shrink:0;border-radius:2px;transition:all .1s}
+
+.panel-btn:hover{border-color:var(--gold-dim);color:var(--text)}
+
+.panel-btn.on{background:#0d1508;border-color:#304828;color:#6ab46a}
+
+.psep{width:1px;height:42px;background:var(--border);flex-shrink:0;margin:0 3px}
+
+/* ── CARD BATTLE PANEL ── */
+
+#battle-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+
+#battle-overlay.hidden{display:none}
+
+#battle-panel{background:var(--ui-bg);border-top:1px solid var(--gold-dim);width:100%;max-width:600px;padding:16px;border-radius:4px 4px 0 0;max-height:70vh;overflow-y:auto}
+
+.battle-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+
+.battle-title{font-size:14px;color:var(--gold);letter-spacing:.1em}
+
+.battle-close{font-size:18px;color:var(--text-dim);cursor:pointer;padding:4px 8px}
+
+.battle-vs{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:16px}
+
+.fighter-side{text-align:center}
+
+.fighter-icon{font-size:28px}
+
+.fighter-name{font-size:10px;color:var(--gold);letter-spacing:.08em;margin-top:4px}
+
+.fighter-hp-bar{width:100%;height:8px;background:#1a1a1a;border-radius:4px;overflow:hidden;margin-top:6px}
+
+.fighter-hp-fill{height:100%;border-radius:4px;transition:width .4s}
+
+.p1-hp{background:var(--red)}
+
+.p2-hp{background:#2980b9}
+
+.vs-text{font-size:18px;color:var(--gold-dim)}
+
+.cards-label{font-size:9px;color:var(--text-dim);letter-spacing:.1em;margin-bottom:8px}
+
+.cards-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}
+
+.cards-row::-webkit-scrollbar{display:none}
+
+.card-item{flex-shrink:0;width:90px;background:#0e0c07;border:1px solid var(--border);border-radius:3px;padding:10px 8px;cursor:pointer;transition:all .15s;text-align:center}
+
+.card-item:hover{border-color:var(--gold-dim);background:#1a1508}
+
+.card-item.played{border-color:var(--gold);background:#1e1808;opacity:.6;pointer-events:none}
+
+.card-type-badge{font-size:7px;letter-spacing:.1em;padding:2px 6px;border-radius:2px;margin-bottom:6px;display:inline-block}
+
+.atk{background:rgba(192,57,43,.3);color:#e74c3c}
+
+.def{background:rgba(41,128,185,.3);color:#3498db}
+
+.spc{background:rgba(142,68,173,.3);color:#9b59b6}
+
+.card-name{font-size:9px;color:var(--gold);letter-spacing:.05em;margin-bottom:4px}
+
+.card-power{font-size:16px;font-weight:700;color:var(--text)}
+
+.card-cost{font-size:8px;color:var(--text-dim)}
+
+.card-desc{font-size:8px;color:var(--text-dim);margin-top:4px;line-height:1.4}
+
+.battle-log-box{margin-top:12px;background:#0a0806;border:1px solid var(--border);border-radius:2px;padding:8px;max-height:80px;overflow-y:auto}
+
+.log-entry{font-size:10px;color:var(--text-dim);padding:2px 0;font-family:'Crimson Text',serif}
+
+.log-entry span{color:var(--gold)}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- ── RESET PASSWORD SCREEN ── -->
+
+<div id="reset-screen" class="screen hidden">
+
+  <div class="auth-box">
+
+    <div class="auth-title">🔑 RESET PASSWORD</div>
+
+    <div class="auth-sub">ENTER YOUR NEW PASSWORD</div>
+
+    <div class="field"><label>NEW PASSWORD</label><input type="password" id="new-pass" placeholder="New password (min 6 chars)"></div>
+
+    <div class="field"><label>CONFIRM PASSWORD</label><input type="password" id="confirm-pass" placeholder="Confirm new password"></div>
+
+    <button class="btn-gold" onclick="submitNewPassword()">SET NEW PASSWORD</button>
+
+    <div class="auth-error" id="reset-error"></div>
+
+  </div>
+
+</div>
+
+<!-- ── AUTH SCREEN ── -->
+
+<div id="auth-screen" class="screen">
+
+  <div class="auth-box">
+
+    <div class="auth-title">⚔ MASTERS BATTLE ARENA</div>
+
+    <div class="auth-sub">SIGN IN TO ENTER THE ARENA</div>
+
+    <div class="field"><label>EMAIL</label><input type="email" id="auth-email" placeholder="your@email.com"></div>
+
+    <div class="field"><label>PASSWORD</label><input type="password" id="auth-pass" placeholder="••••••••"></div>
+
+    <button class="btn-gold" onclick="handleSignIn()">ENTER THE ARENA</button>
+
+    <button class="btn-ghost" onclick="handleSignUp()">CREATE ACCOUNT</button>
+
+    <div style="text-align:center;margin-top:10px"><span onclick="handleForgotPassword()" style="font-size:10px;color:#7a6a48;cursor:pointer;letter-spacing:.06em;font-family:Cinzel,serif">FORGOT PASSWORD?</span></div>
+
+    <div class="auth-error" id="auth-error"></div>
+
+  </div>
+
+</div>
+
+<!-- ── MASTER SELECT SCREEN ── -->
+
+<div id="master-screen" class="screen hidden">
+
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center;width:100%;max-width:520px;padding:20px">
+
+    <div class="master-title">CHOOSE YOUR MASTER</div>
+
+    <div class="master-sub">SELECT THE FIGHTER YOU WILL CONTROL IN THE ARENA</div>
+
+    <div class="masters-grid" id="masters-grid"></div>
+
+    <button class="btn-gold" style="max-width:240px" onclick="confirmMaster()">ENTER THE ARENA</button>
+
+    <div class="auth-error" id="master-error"></div>
+
+  </div>
+
+</div>
+
+<!-- ── ARENA SCREEN ── -->
+
+<div id="arena-screen" class="screen hidden" style="position:fixed;flex-direction:column">
+
+  <!-- Top HUD bar -->
+
+  <div id="arena-top">
+
+    <div class="player-hud" id="p1-hud">
+
+      <div class="hud-icon" id="p1-icon">🐉</div>
+
+      <div class="hud-info">
+
+        <div class="hud-name" id="p1-name">PLAYER 1</div>
+
+        <div class="health-bar"><div class="health-fill" id="p1-hp-bar" style="width:100%"></div></div>
+
+        <div class="hud-hp" id="p1-hp-text">100 HP</div>
+
+      </div>
+
+    </div>
+
+    <div class="turn-badge" id="turn-badge">YOUR TURN</div>
+
+    <div class="player-hud" id="p2-hud" style="justify-content:flex-end">
+
+      <div class="hud-info" style="align-items:flex-end">
+
+        <div class="hud-name" id="p2-name">WAITING...</div>
+
+        <div class="health-bar"><div class="health-fill" id="p2-hp-bar" style="width:100%;background:#2980b9"></div></div>
+
+        <div class="hud-hp" id="p2-hp-text">100 HP</div>
+
+      </div>
+
+      <div class="hud-icon" id="p2-icon">⚔</div>
+
+    </div>
+
+  </div>
+
+  <!-- Map canvas area -->
+
+  <div id="arena-map">
+
+    <div id="stage-mount"></div>
+
+    <div id="arena-hud">PAN · ZOOM · MOVE YOUR TOKEN</div>
+
+    <div id="arena-toast"></div>
+
+    <div id="zoom-btns">
+
+      <div class="zbtn" id="btn-zi">+</div>
+
+      <div class="zbtn" id="btn-zo">−</div>
+
+      <div class="zbtn" id="btn-zh" style="font-size:11px">⌂</div>
+
+    </div>
+
+  </div>
+
+  <!-- Bottom panel -->
+
+  <div id="arena-panel">
+
+    <div class="panel-btn" onclick="openBattle()">⚔ BATTLE CARDS</div>
+
+    <div class="psep"></div>
+
+    <div class="panel-btn on" id="btn-fog" onclick="toggleFog()">◼ FOG ON</div>
+
+    <div class="panel-btn" id="btn-grid" onclick="toggleGrid()">▦ GRID OFF</div>
+
+    <div class="psep"></div>
+
+    <div class="panel-btn" onclick="startPractice()">🥋 PRACTICE MODE</div>
+
+    <div class="panel-btn" onclick="findMatch()">🔍 FIND MATCH</div>
+
+    <div class="panel-btn" onclick="signOut()" style="margin-left:auto">✕ SIGN OUT</div>
+
+  </div>
+
+</div>
+
+<!-- ── CARD BATTLE OVERLAY ── -->
+
+<div id="battle-overlay" class="hidden">
+
+  <div id="battle-panel">
+
+    <div class="battle-header">
+
+      <div class="battle-title">⚔ CARD BATTLE</div>
+
+      <div class="battle-close" onclick="closeBattle()">✕</div>
+
+    </div>
+
+    <div class="battle-vs">
+
+      <div class="fighter-side">
+
+        <div class="fighter-icon" id="b-p1-icon">🐉</div>
+
+        <div class="fighter-name" id="b-p1-name">DRAGON FIST</div>
+
+        <div class="fighter-hp-bar"><div class="fighter-hp-fill p1-hp" id="b-p1-hp" style="width:100%"></div></div>
+
+      </div>
+
+      <div class="vs-text">VS</div>
+
+      <div class="fighter-side">
+
+        <div class="fighter-icon" id="b-p2-icon">🛡️</div>
+
+        <div class="fighter-name" id="b-p2-name">IRON GUARD</div>
+
+        <div class="fighter-hp-bar"><div class="fighter-hp-fill p2-hp" id="b-p2-hp" style="width:100%"></div></div>
+
+      </div>
+
+    </div>
+
+    <div class="cards-label">YOUR CARDS — TAP TO PLAY</div>
+
+    <div class="cards-row" id="cards-row"></div>
+
+    <div class="battle-log-box">
+
+      <div id="battle-log"></div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/konva/8.4.2/konva.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+// ═══════════════════════════════════════════════════════════════
+
+// SUPABASE CONFIG
+
+// ═══════════════════════════════════════════════════════════════
+
+const SUPABASE_URL = 'https://ipthwxpkpbtykhoxpuva.supabase.co';
+
+const SUPABASE_ANON_KEY = 'sb_publishable_UWA82zaPGRU8GAF_xJb89w_HQQ1l6jU';
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ═══════════════════════════════════════════════════════════════
+
+// MASTER DEFINITIONS (local fallback until DB loads)
+
+// ═══════════════════════════════════════════════════════════════
+
+const LOCAL_MASTERS = [
+
+  { id:'dragon', name:'Dragon Fist', description:'Explosive striker', base_health:85, base_attack:15, base_defense:4, icon_url:'🐉' },
+
+  { id:'guard',  name:'Iron Guard',  description:'Defensive tank',    base_health:120,base_attack:8,  base_defense:12,icon_url:'🛡️'},
+
+  { id:'shadow', name:'Swift Shadow',description:'Agile rogue',       base_health:90, base_attack:12, base_defense:6, icon_url:'👤'},
+
+  { id:'sage',   name:'Mystic Sage', description:'Spiritual master',  base_health:95, base_attack:10, base_defense:8, icon_url:'🧙'},
+
+];
+
+const LOCAL_CARDS = {
+
+  dragon: [
+
+    { id:'d1', name:'Flame Punch',    card_type:'attack',  power:15, cost:1, description:'Quick explosive strike', is_starter:true },
+
+    { id:'d2', name:'Dragon Breath',  card_type:'attack',  power:25, cost:3, description:'Massive area damage',    is_starter:false},
+
+    { id:'d3', name:'Counter',        card_type:'defense', power:8,  cost:1, description:'Dodge and respond',      is_starter:true },
+
+  ],
+
+  guard: [
+
+    { id:'g1', name:'Shield Bash',    card_type:'attack',  power:12, cost:2, description:'Attack and defend',      is_starter:true },
+
+    { id:'g2', name:'Iron Skin',      card_type:'defense', power:20, cost:2, description:'Reduce all damage',      is_starter:true },
+
+    { id:'g3', name:'Fortress',       card_type:'defense', power:30, cost:4, description:'Ultimate protection',    is_starter:false},
+
+  ],
+
+  shadow: [
+
+    { id:'s1', name:'Quick Strike',   card_type:'attack',  power:12, cost:1, description:'Fast accurate hit',      is_starter:true },
+
+    { id:'s2', name:'Evasion',        card_type:'defense', power:10, cost:1, description:'Dodge next attack',      is_starter:true },
+
+    { id:'s3', name:'Assassinate',    card_type:'attack',  power:28, cost:4, description:'Lethal finish move',     is_starter:false},
+
+  ],
+
+  sage: [
+
+    { id:'m1', name:'Mystic Bolt',    card_type:'attack',  power:14, cost:2, description:'Spiritual energy attack',is_starter:true },
+
+    { id:'m2', name:'Healing Touch',  card_type:'defense', power:15, cost:2, description:'Restore health',         is_starter:true },
+
+    { id:'m3', name:'Transcendence',  card_type:'special', power:20, cost:5, description:'Heal and boost stats',   is_starter:false},
+
+  ],
+
+};
+
+// ═══════════════════════════════════════════════════════════════
+
+// APP STATE
+
+// ═══════════════════════════════════════════════════════════════
+
+let currentUser = null;
+
+let currentProfile = null;
+
+let chosenMaster = null;
+
+let masters = LOCAL_MASTERS;
+
+let sessionData = null;
+
+let myPlayerSlot = null; // 'player1' or 'player2'
+
+let p1Health = 100, p2Health = 100;
+
+let battleLog = [];
+
+let realtimeSub = null;
+
+// ═══════════════════════════════════════════════════════════════
+
+// AUTH
+
+// ═══════════════════════════════════════════════════════════════
+
+async function handleForgotPassword() {
+
+  const email = document.getElementById('auth-email').value.trim();
+
+  const errEl = document.getElementById('auth-error');
+
+  if (!email) { errEl.style.color='#D4AF37'; errEl.textContent = 'Enter your email above first'; return; }
+
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+
+    redirectTo: window.location.href.split('#')[0]
+
+  });
+
+  if (error) { errEl.textContent = error.message; return; }
+
+  errEl.style.color = '#D4AF37';
+
+  errEl.textContent = 'Password reset email sent — check your inbox!';
+
+}
+
+async function handleSignIn() {
+
+  const email = document.getElementById('auth-email').value.trim();
+
+  const pass  = document.getElementById('auth-pass').value;
+
+  const errEl = document.getElementById('auth-error');
+
+  errEl.textContent = '';
+
+  if (!email || !pass) { errEl.textContent = 'Please enter email and password'; return; }
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+
+  if (error) { errEl.textContent = error.message; return; }
+
+  currentUser = data.user;
+
+  await loadProfileOrCreate();
+
+}
+
+async function handleSignUp() {
+
+  const email = document.getElementById('auth-email').value.trim();
+
+  const pass  = document.getElementById('auth-pass').value;
+
+  const errEl = document.getElementById('auth-error');
+
+  errEl.textContent = '';
+
+  if (!email || !pass) { errEl.textContent = 'Please enter email and password'; return; }
+
+  if (pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; return; }
+
+  const { data, error } = await sb.auth.signUp({ email, password: pass });
+
+  if (error) { errEl.textContent = error.message; return; }
+
+  if (data.user) {
+
+    currentUser = data.user;
+
+    await loadProfileOrCreate();
+
+  } else {
+
+    errEl.textContent = 'Check your email to confirm your account.';
+
+  }
+
+}
+
+async function loadProfileOrCreate() {
+
+  try {
+
+    const { data: profile } = await sb.from('users').select('*').eq('auth_id', currentUser.id).single();
+
+    if (profile) {
+
+      currentProfile = profile;
+
+      if (profile.chosen_master_id) {
+
+        chosenMaster = masters.find(m => m.id === profile.chosen_master_id) || masters[0];
+
+        showArena();
+
+      } else {
+
+        showMasterSelect();
+
+      }
+
+    } else {
+
+      showMasterSelect();
+
+    }
+
+  } catch (e) {
+
+    showMasterSelect();
+
+  }
+
+}
+
+async function signOut() {
+
+  await sb.auth.signOut();
+
+  currentUser = null; currentProfile = null; chosenMaster = null; sessionData = null;
+
+  if (realtimeSub) { realtimeSub.unsubscribe(); realtimeSub = null; }
+
+  show('auth-screen');
+
+}
+
+// ═══════════════════════════════════════════════════════════════
+
+// SCREENS
+
+// ═══════════════════════════════════════════════════════════════
+
+function show(id) {
+
+  ['auth-screen','master-screen','arena-screen','reset-screen'].forEach(s => {
+
+    document.getElementById(s).classList.toggle('hidden', s !== id);
+
+  });
+
+}
+
+function showMasterSelect() {
+
+  show('master-screen');
+
+  renderMasterGrid();
+
+}
+
+// ═══════════════════════════════════════════════════════════════
+
+// MASTER SELECTION
+
+// ═══════════════════════════════════════════════════════════════
+
+function renderMasterGrid() {
+
+  const grid = document.getElementById('masters-grid');
+
+  grid.innerHTML = '';
+
+  masters.forEach(m => {
+
+    const div = document.createElement('div');
+
+    div.className = 'master-card';
+
+    div.innerHTML = `
+
+      <div class="master-icon">${m.icon_url}</div>
+
+      <div class="master-name">${m.name.toUpperCase()}</div>
+
+      <div class="master-desc">${m.description}</div>
+
+      <div class="master-stats">
+
+        <div class="stat">HP <span>${m.base_health}</span></div>
+
+        <div class="stat">ATK <span>${m.base_attack}</span></div>
+
+        <div class="stat">DEF <span>${m.base_defense}</span></div>
+
+      </div>`;
+
+    div.addEventListener('click', () => {
+
+      document.querySelectorAll('.master-card').forEach(c => c.classList.remove('sel'));
+
+      div.classList.add('sel');
+
+      chosenMaster = m;
+
+    });
+
+    grid.appendChild(div);
+
+  });
+
+}
+
+async function confirmMaster() {
+
+  if (!chosenMaster) { document.getElementById('master-error').textContent = 'Please select a master first'; return; }
+
+  if (currentUser) {
+
+    try {
+
+      await sb.from('users').upsert({
+
+        auth_id: currentUser.id,
+
+        username: currentUser.email.split('@')[0],
+
+        chosen_master_id: chosenMaster.id,
+
+        updated_at: new Date().toISOString()
+
+      }, { onConflict: 'auth_id' });
+
+    } catch(e) { /* tables not set up yet, continue anyway */ }
+
+  }
+
+  showArena();
+
+}
+
+// ═══════════════════════════════════════════════════════════════
+
+// ARENA + KONVA CANVAS
+
+// ═══════════════════════════════════════════════════════════════
+
+const C = 40, COLS = 24, ROWS = 16, MW = COLS*C, MH = ROWS*C;
+
+let stage, layerMap, layerGrid, layerFog, layerTokens;
+
+let fogEnabled = true, gridEnabled = false;
+
+let fog = {}, fogShapes = {};
+
+let view = { sc:1, tx:0, ty:0, ix:0, iy:0, is:1 };
+
+let p1Token = null, p2Token = null;
+
+let panning = null, pinchStart = null;
+
+const ZONES = [
+
+  { x:2, y:2, w:20, h:12, fill:'#2a2218', name:'ARENA FLOOR' },
+
+  { x:0, y:4, w:2,  h:8,  fill:'#1e1a12' },
+
+  { x:22,y:4, w:2,  h:8,  fill:'#1e1a12' },
+
+  { x:4, y:0, w:16, h:2,  fill:'#1e1a12' },
+
+  { x:4, y:14,w:16, h:2,  fill:'#1e1a12' },
+
+  { x:2, y:2, w:3,  h:3,  fill:'#363020' },
+
+  { x:19,y:2, w:3,  h:3,  fill:'#363020' },
+
+  { x:2, y:11,w:3,  h:3,  fill:'#363020' },
+
+  { x:19,y:11,w:3,  h:3,  fill:'#363020' },
+
+  { x:9, y:5, w:6,  h:6,  fill:'#302818' },
+
+];
+
+function showArena() {
+
+  show('arena-screen');
+
+  document.getElementById('arena-screen').classList.remove('hidden');
+
+  document.getElementById('arena-screen').style.display = 'flex';
+
+  if (chosenMaster) {
+
+    document.getElementById('p1-icon').textContent  = chosenMaster.icon_url;
+
+    document.getElementById('p1-name').textContent  = chosenMaster.name.toUpperCase();
+
+    document.getElementById('b-p1-icon').textContent = chosenMaster.icon_url;
+
+    document.getElementById('b-p1-name').textContent = chosenMaster.name.toUpperCase();
+
+  }
+
+  setTimeout(initKonva, 100);
+
+}
+
+function initKonva() {
+
+  const mapArea = document.getElementById('arena-map');
+
+  const SW = mapArea.offsetWidth || window.innerWidth;
+
+  const SH = mapArea.offsetHeight || window.innerHeight - 120;
+
+  stage = new Konva.Stage({ container:'stage-mount', width:SW, height:SH });
+
+  layerMap    = new Konva.Layer();
+
+  layerGrid   = new Konva.Layer();
+
+  layerFog    = new Konva.Layer();
+
+  layerTokens = new Konva.Layer();
+
+  stage.add(layerMap, layerGrid, layerFog, layerTokens);
+
+  const is = Math.min(SW/MW, SH/MH) * 0.88;
+
+  const ix = (SW - MW*is)/2, iy = (SH - MH*is)/2;
+
+  view = { sc:is, tx:ix, ty:iy, ix, iy, is };
+
+  applyView();
+
+  buildArenaMap();
+
+  buildGrid();
+
+  buildFog();
+
+  placeTokens();
+
+  attachInputs();
+
+  if (sessionData) subscribeToSession(sessionData.id);
+
+  arenaToast('Welcome, ' + (chosenMaster ? chosenMaster.name : 'Master') + '!');
+
+}
+
+function applyView() {
+
+  [layerMap, layerGrid, layerFog, layerTokens].forEach(l => {
+
+    l.x(view.tx); l.y(view.ty); l.scaleX(view.sc); l.scaleY(view.sc);
+
+  });
+
+  stage && stage.batchDraw();
+
+}
+
+function buildArenaMap() {
+
+  layerMap.add(new Konva.Rect({x:0,y:0,width:MW,height:MH,fill:'#0a0806'}));
+
+  ZONES.forEach(z => {
+
+    layerMap.add(new Konva.Rect({x:z.x*C,y:z.y*C,width:z.w*C,height:z.h*C,fill:z.fill,stroke:'#1a1610',strokeWidth:1.5}));
+
+  });
+
+  const cx = MW/2, cy = MH/2;
+
+  layerMap.add(new Konva.Circle({x:cx,y:cy,radius:C*2.8,fill:'transparent',stroke:'rgba(212,175,55,.25)',strokeWidth:2,dash:[6,4],listening:false}));
+
+  layerMap.add(new Konva.Circle({x:cx,y:cy,radius:C*.5, fill:'rgba(212,175,55,.15)',listening:false}));
+
+  [[2,2],[19,2],[2,11],[19,11]].forEach(([c,r]) => {
+
+    layerMap.add(new Konva.Circle({x:c*C+C/2,y:r*C+C/2,radius:8,fill:'rgba(212,175,55,.2)',stroke:'rgba(212,175,55,.4)',strokeWidth:1,listening:false}));
+
+  });
+
+  layerMap.add(new Konva.Text({x:cx-80,y:cy-8,text:'ARENA — MAP PLACEHOLDER',fontSize:10,fill:'rgba(212,175,55,.2)',fontFamily:'Cinzel,serif',letterSpacing:2,listening:false}));
+
+  layerMap.batchDraw();
+
+}
+
+function buildGrid() {
+
+  layerGrid.destroyChildren();
+
+  if (!gridEnabled) { layerGrid.batchDraw(); return; }
+
+  for(let c=0;c<=COLS;c++) layerGrid.add(new Konva.Line({points:[c*C,0,c*C,MH],stroke:'rgba(212,175,55,.04)',strokeWidth:.5,listening:false}));
+
+  for(let r=0;r<=ROWS;r++) layerGrid.add(new Konva.Line({points:[0,r*C,MW,r*C],stroke:'rgba(212,175,55,.04)',strokeWidth:.5,listening:false}));
+
+  layerGrid.batchDraw();
+
+}
+
+function buildFog() {
+
+  layerFog.destroyChildren(); fogShapes={};
+
+  if(!fogEnabled){layerFog.batchDraw();return;}
+
+  for(let c=0;c<COLS;c++) for(let r=0;r<ROWS;r++){
+
+    if(fog[c+'_'+r])continue;
+
+    const cc=c,rr=r;
+
+    const rect=new Konva.Rect({x:c*C,y:r*C,width:C,height:C,fill:'rgba(0,0,0,.92)'});
+
+    rect.on('click tap',e=>{e.cancelBubble=true;fog[cc+'_'+rr]=true;rect.destroy();delete fogShapes[cc+'_'+rr];layerFog.batchDraw();arenaToast('Area revealed!');});
+
+    fogShapes[c+'_'+r]=rect; layerFog.add(rect);
+
+  }
+
+  if(Object.keys(fog).length===0){
+
+    for(let c=8;c<16;c++)for(let r=4;r<12;r++){fog[c+'_'+r]=true;}
+
+    buildFog(); return;
+
+  }
+
+  layerFog.batchDraw();
+
+}
+
+function placeTokens() {
+
+  if(!chosenMaster)return;
+
+  p1Token = makeToken(5*C+C/2, 8*C+C/2, chosenMaster.icon_url, '#C0392B', '#E74C3C', true);
+
+  layerTokens.add(p1Token); layerTokens.batchDraw();
+
+  p2Token = makeToken(18*C+C/2, 8*C+C/2, '⚔', '#2980B9', '#3498DB', false);
+
+  layerTokens.add(p2Token); layerTokens.batchDraw();
+
+}
+
+function makeToken(x, y, icon, fill, ring, draggable) {
+
+  const R=C*.38;
+
+  const grp=new Konva.Group({x,y,draggable});
+
+  grp.add(new Konva.Circle({radius:R+2,fill:'rgba(0,0,0,.5)',offsetY:-3,listening:false}));
+
+  grp.add(new Konva.Circle({radius:R+5,fill:ring,opacity:.2,listening:false}));
+
+  const body=new Konva.Circle({id:'body',radius:R,fill,stroke:ring,strokeWidth:2.5});
+
+  grp.add(body);
+
+  grp.add(new Konva.Text({text:icon,fontSize:Math.floor(R*.75),width:R*2,align:'center',offsetX:R,offsetY:Math.floor(R*.4),listening:false}));
+
+  if(draggable){
+
+    grp.on('dragend',function(){
+
+      const nx=Math.floor(this.x()/C)*C+C/2;
+
+      const ny=Math.floor(this.y()/C)*C+C/2;
+
+      this.x(nx);this.y(ny);
+
+      layerTokens.batchDraw();
+
+      updatePositionInDB(nx,ny);
+
+      if(p2Token){
+
+        const dx=Math.abs(nx-p2Token.x()),dy=Math.abs(ny-p2Token.y());
+
+        if(dx<=C*1.5&&dy<=C*1.5) arenaToast('Masters are adjacent — tap BATTLE CARDS!');
+
+      }
+
+    });
+
+    grp.on('mouseenter',()=>{body.strokeWidth(4);layerTokens.batchDraw();});
+
+    grp.on('mouseleave',()=>{body.strokeWidth(2.5);layerTokens.batchDraw();});
+
+  }
+
+  return grp;
+
+}
+
+async function updatePositionInDB(x, y) {
+
+  if (!sessionData || !currentUser) return;
+
+  const col = myPlayerSlot === 'player1' ? 'player1_x' : 'player2_x';
+
+  const rowCol = myPlayerSlot === 'player1' ? 'player1_y' : 'player2_y';
+
+  try {
+
+    await sb.from('arena_sessions').update({
+
+      [col]: Math.floor(x/C), [rowCol]: Math.floor(y/C), updated_at: new Date().toISOString()
+
+    }).eq('id', sessionData.id);
+
+  } catch(e) {}
+
+}
+
+function attachInputs() {
+
+  stage.on('mousedown', e=>{
+
+    if(e.target&&e.target.getLayer&&e.target.getLayer()===layerTokens)return;
+
+    const pos=stage.getPointerPosition(); panning={sx:pos.x,sy:pos.y,tx0:view.tx,ty0:view.ty};
+
+  });
+
+  stage.on('mousemove',()=>{
+
+    if(!panning)return;
+
+    const pos=stage.getPointerPosition(); view.tx=panning.tx0+pos.x-panning.sx; view.ty=panning.ty0+pos.y-panning.sy; applyView();
+
+  });
+
+  stage.on('mouseup mouseleave',()=>{panning=null;});
+
+  stage.on('wheel',e=>{
+
+    e.evt.preventDefault();
+
+    const f=e.evt.deltaY<0?1.1:1/1.1,ns=Math.max(.2,Math.min(4,view.sc*f));
+
+    const pos=stage.getPointerPosition();
+
+    view.tx=pos.x-(pos.x-view.tx)/view.sc*ns; view.ty=pos.y-(pos.y-view.ty)/view.sc*ns; view.sc=ns; applyView();
+
+  });
+
+  const el=stage.container();
+
+  el.addEventListener('touchstart',e=>{
+
+    if(e.touches.length===2){
+
+      const[t1,t2]=[e.touches[0],e.touches[1]],rect=el.getBoundingClientRect();
+
+      pinchStart={dist:Math.hypot(t1.clientX-t2.clientX,t1.clientY-t2.clientY),sc0:view.sc,tx0:view.tx,ty0:view.ty,
+
+        cx:(t1.clientX+t2.clientX)/2-rect.left,cy:(t1.clientY+t2.clientY)/2-rect.top};panning=null;
+
+    } else if(e.touches.length===1){
+
+      const t=e.touches[0]; panning={sx:t.clientX,sy:t.clientY,tx0:view.tx,ty0:view.ty};
+
+    }
+
+  },{passive:true});
+
+  el.addEventListener('touchmove',e=>{
+
+    e.preventDefault();
+
+    if(e.touches.length===2&&pinchStart){
+
+      const[t1,t2]=[e.touches[0],e.touches[1]],nd=Math.hypot(t1.clientX-t2.clientX,t1.clientY-t2.clientY),ns=Math.max(.2,Math.min(4,pinchStart.sc0*(nd/pinchStart.dist)));
+
+      view.tx=pinchStart.cx-(pinchStart.cx-pinchStart.tx0)/pinchStart.sc0*ns; view.ty=pinchStart.cy-(pinchStart.cy-pinchStart.ty0)/pinchStart.sc0*ns; view.sc=ns; applyView();
+
+    } else if(e.touches.length===1&&panning){
+
+      const t=e.touches[0]; view.tx=panning.tx0+t.clientX-panning.sx; view.ty=panning.ty0+t.clientY-panning.sy; applyView();
+
+    }
+
+  },{passive:false});
+
+  el.addEventListener('touchend',e=>{if(e.touches.length<2)pinchStart=null;if(!e.touches.length)panning=null;},{passive:true});
+
+  document.getElementById('btn-zi').onclick=()=>zoomAt(1.3);
+
+  document.getElementById('btn-zo').onclick=()=>zoomAt(1/1.3);
+
+  document.getElementById('btn-zh').onclick=()=>{view.tx=view.ix;view.ty=view.iy;view.sc=view.is;applyView();};
+
+}
+
+function zoomAt(f){
+
+  const ns=Math.max(.2,Math.min(4,view.sc*f)),cx=stage.width()/2,cy=stage.height()/2;
+
+  view.tx=cx-(cx-view.tx)/view.sc*ns; view.ty=cy-(cy-view.ty)/view.sc*ns; view.sc=ns; applyView();
+
+}
+
+function toggleFog(){
+
+  fogEnabled=!fogEnabled; buildFog();
+
+  document.getElementById('btn-fog').textContent='◼ FOG '+(fogEnabled?'ON':'OFF');
+
+  document.getElementById('btn-fog').classList.toggle('on',fogEnabled);
+
+}
+
+function toggleGrid(){
+
+  gridEnabled=!gridEnabled; buildGrid();
+
+  document.getElementById('btn-grid').textContent='▦ GRID '+(gridEnabled?'ON':'OFF');
+
+  document.getElementById('btn-grid').classList.toggle('on',gridEnabled);
+
+}
+
+function startPractice() {
+
+  const aiMasters = LOCAL_MASTERS.filter(m => m.id !== chosenMaster?.id);
+
+  const ai = aiMasters[Math.floor(Math.random() * aiMasters.length)];
+
+  myPlayerSlot = 'player1';
+
+  sessionData = null;
+
+  document.getElementById('p2-icon').textContent = ai.icon_url;
+
+  document.getElementById('p2-name').textContent = ai.name.toUpperCase();
+
+  document.getElementById('b-p2-icon').textContent = ai.icon_url;
+
+  document.getElementById('b-p2-name').textContent = ai.name.toUpperCase();
+
+  p1Health = chosenMaster?.base_health || 100;
+
+  p2Health = ai.base_health || 100;
+
+  updateHealthBars(p1Health, p2Health);
+
+  if (p2Token && layerTokens) {
+
+    p2Token.x(18*C+C/2); p2Token.y(8*C+C/2);
+
+    const aiIcon = p2Token.findOne('Text');
+
+    if (aiIcon) { aiIcon.text(ai.icon_url); }
+
+    layerTokens.batchDraw();
+
+  }
+
+  for (let c=2;c<22;c++) for (let r=2;r<14;r++) fog[c+'_'+r]=true;
+
+  buildFog();
+
+  arenaToast('Practice Mode — fighting ' + ai.name + '!');
+
+  document.getElementById('turn-badge').textContent = 'YOUR TURN';
+
+}
+
+async function findMatch() {
+
+  arenaToast('Searching for opponent...');
+
+  if (!currentUser) { arenaToast('Sign in to find a match'); return; }
+
+  try {
+
+    const { data: open } = await sb.from('arena_sessions').select('*').eq('status','active').is('player2_id',null).neq('player1_id',currentUser.id).limit(1);
+
+    if (open && open.length > 0) {
+
+      const sess = open[0];
+
+      await sb.from('arena_sessions').update({ player2_id:currentUser.id, player2_master_id:chosenMaster?.id, updated_at:new Date().toISOString() }).eq('id',sess.id);
+
+      sessionData = sess; myPlayerSlot = 'player2';
+
+      arenaToast('Opponent found! You are Player 2');
+
+      subscribeToSession(sess.id);
+
+    } else {
+
+      const { data:sess } = await sb.from('arena_sessions').insert({
+
+        player1_id: currentUser.id,
+
+        player1_master_id: chosenMaster?.id || null,
+
+        status: 'active'
+
+      }).select().single();
+
+      if (sess) {
+
+        sessionData = sess; myPlayerSlot = 'player1';
+
+        arenaToast('Arena open — waiting for opponent...');
+
+        subscribeToSession(sess.id);
+
+      }
+
+    }
+
+  } catch(e) {
+
+    arenaToast('Arena matchmaking unavailable (set up DB first)');
+
+  }
+
+}
+
+function subscribeToSession(sessionId) {
+
+  if (realtimeSub) realtimeSub.unsubscribe();
+
+  realtimeSub = sb.channel('arena_' + sessionId)
+
+    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'arena_sessions', filter:`id=eq.${sessionId}` }, payload => {
+
+      sessionData = payload.new;
+
+      syncTokensFromSession(payload.new);
+
+      updateHealthBars(payload.new.player1_health, payload.new.player2_health);
+
+    })
+
+    .subscribe();
+
+}
+
+function syncTokensFromSession(sess) {
+
+  if (!p1Token || !p2Token || !layerTokens) return;
+
+  if (myPlayerSlot === 'player1') {
+
+    p2Token.x(sess.player2_x * C + C/2); p2Token.y(sess.player2_y * C + C/2);
+
+  } else {
+
+    p1Token.x(sess.player1_x * C + C/2); p1Token.y(sess.player1_y * C + C/2);
+
+  }
+
+  layerTokens.batchDraw();
+
+}
+
+function updateHealthBars(hp1, hp2) {
+
+  p1Health = hp1 || 100; p2Health = hp2 || 100;
+
+  document.getElementById('p1-hp-bar').style.width = p1Health + '%';
+
+  document.getElementById('p2-hp-bar').style.width = p2Health + '%';
+
+  document.getElementById('p1-hp-text').textContent = p1Health + ' HP';
+
+  document.getElementById('p2-hp-text').textContent = p2Health + ' HP';
+
+  document.getElementById('b-p1-hp').style.width = p1Health + '%';
+
+  document.getElementById('b-p2-hp').style.width = p2Health + '%';
+
+}
+
+function openBattle() {
+
+  document.getElementById('battle-overlay').classList.remove('hidden');
+
+  renderCards();
+
+}
+
+function closeBattle() {
+
+  document.getElementById('battle-overlay').classList.add('hidden');
+
+}
+
+function getMyCards() {
+
+  if (!chosenMaster) return [];
+
+  const key = Object.keys(LOCAL_CARDS).find(k => chosenMaster.id.includes(k) || chosenMaster.name.toLowerCase().includes(k)) || 'dragon';
+
+  return LOCAL_CARDS[key] || LOCAL_CARDS.dragon;
+
+}
+
+function renderCards() {
+
+  const row = document.getElementById('cards-row');
+
+  row.innerHTML = '';
+
+  const cards = getMyCards();
+
+  cards.forEach(card => {
+
+    const div = document.createElement('div');
+
+    div.className = 'card-item';
+
+    const typeClass = card.card_type === 'attack' ? 'atk' : card.card_type === 'defense' ? 'def' : 'spc';
+
+    const typeName  = card.card_type === 'attack' ? 'ATTACK' : card.card_type === 'defense' ? 'DEFENSE' : 'SPECIAL';
+
+    div.innerHTML = `
+
+      <div class="card-type-badge ${typeClass}">${typeName}</div>
+
+      <div class="card-name">${card.name.toUpperCase()}</div>
+
+      <div class="card-power">${card.power}</div>
+
+      <div class="card-cost">COST: ${card.cost}</div>
+
+      <div class="card-desc">${card.description}</div>`;
+
+    div.addEventListener('click', () => playCard(card, div));
+
+    row.appendChild(div);
+
+  });
+
+}
+
+async function playCard(card, el) {
+
+  el.classList.add('played');
+
+  const damage = card.power;
+
+  const isAttack = card.card_type === 'attack';
+
+  const isHeal = card.card_type === 'defense' || card.card_type === 'special';
+
+  if (isAttack) {
+
+    if (myPlayerSlot === 'player1' || !myPlayerSlot) p2Health = Math.max(0, p2Health - damage);
+
+    else p1Health = Math.max(0, p1Health - damage);
+
+    addBattleLog(`${chosenMaster?.name || 'You'} played ${card.name} for ${damage} damage!`);
+
+  } else {
+
+    if (myPlayerSlot === 'player1' || !myPlayerSlot) p1Health = Math.min(100, p1Health + Math.floor(damage/2));
+
+    else p2Health = Math.min(100, p2Health + Math.floor(damage/2));
+
+    addBattleLog(`${chosenMaster?.name || 'You'} used ${card.name} — restored ${Math.floor(damage/2)} HP!`);
+
+  }
+
+  updateHealthBars(p1Health, p2Health);
+
+  if (sessionData) {
+
+    try {
+
+      await sb.from('arena_sessions').update({
+
+        player1_health: p1Health, player2_health: p2Health,
+
+        current_turn: myPlayerSlot === 'player1' ? 'player2' : 'player1',
+
+        updated_at: new Date().toISOString()
+
+      }).eq('id', sessionData.id);
+
+      await sb.from('battle_log').insert({
+
+        session_id: sessionData.id, player_id: currentUser?.id,
+
+        card_played_id: card.id, damage_dealt: isAttack ? damage : 0,
+
+        damage_mitigated: isHeal ? damage : 0, event_type: 'card_play'
+
+      });
+
+    } catch(e) {}
+
+  }
+
+  if (p1Health <= 0 || p2Health <= 0) {
+
+    const winner = p2Health <= 0 ? (chosenMaster?.name || 'You') : 'Opponent';
+
+    addBattleLog(`🏆 ${winner} wins the battle!`);
+
+    arenaToast(winner + ' wins!');
+
+    if (sessionData) {
+
+      try { await sb.from('arena_sessions').update({ status: p2Health<=0?'player1_won':'player2_won' }).eq('id',sessionData.id); } catch(e){}
+
+    }
+
+  }
+
+}
+
+function addBattleLog(msg) {
+
+  battleLog.push(msg);
+
+  const log = document.getElementById('battle-log');
+
+  const entry = document.createElement('div');
+
+  entry.className = 'log-entry';
+
+  entry.innerHTML = `<span>›</span> ${msg}`;
+
+  log.appendChild(entry);
+
+  log.scrollTop = log.scrollHeight;
+
+}
+
+let _tt;
+
+function arenaToast(msg) {
+
+  const el=document.getElementById('arena-toast'); if(!el)return;
+
+  el.textContent=msg; el.classList.add('show');
+
+  clearTimeout(_tt); _tt=setTimeout(()=>{ const e=document.getElementById('arena-toast');if(e)e.classList.remove('show');},2500);
+
+}
+
+(async()=>{
+
+  const hash = window.location.hash;
+
+  if (hash && hash.includes('type=recovery')) {
+
+    show('reset-screen');
+
+    return;
+
+  }
+
+  const { data:{ session } } = await sb.auth.getSession();
+
+  if (session) {
+
+    currentUser = session.user;
+
+    await loadProfileOrCreate();
+
+  }
+
+})();
+
+async function submitNewPassword() {
+
+  const np = document.getElementById('new-pass').value;
+
+  const cp = document.getElementById('confirm-pass').value;
+
+  const errEl = document.getElementById('reset-error');
+
+  errEl.textContent = '';
+
+  if (!np || np.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; return; }
+
+  if (np !== cp) { errEl.textContent = 'Passwords do not match'; return; }
+
+  const { error } = await sb.auth.updateUser({ password: np });
+
+  if (error) { errEl.textContent = error.message; return; }
+
+  errEl.style.color = '#D4AF37';
+
+  errEl.textContent = 'Password updated! Redirecting...';
+
+  window.location.hash = '';
+
+  setTimeout(() => show('auth-screen'), 1500);
+
+}
+
+</script>
+
+</body>
+
+</html>

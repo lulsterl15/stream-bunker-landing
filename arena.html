@@ -216,7 +216,7 @@ html,body{background:var(--bg);overflow:hidden;height:100%;
 
   <div class="auth-box">
 
-    <div class="auth-title">🔑 RESET PASSWORD</div>
+    <div class="auth-title">ð RESET PASSWORD</div>
 
     <div class="auth-sub">ENTER YOUR NEW PASSWORD</div>
 
@@ -236,13 +236,13 @@ html,body{background:var(--bg);overflow:hidden;height:100%;
 
   <div class="auth-box">
 
-    <div class="auth-title">⚔ MASTERS BATTLE ARENA</div>
+    <div class="auth-title">â MASTERS BATTLE ARENA</div>
 
     <div class="auth-sub">SIGN IN TO ENTER THE ARENA</div>
 
     <div class="field"><label>EMAIL</label><input type="email" id="auth-email" placeholder="your@email.com"></div>
 
-    <div class="field"><label>PASSWORD</label><input type="password" id="auth-pass" placeholder="••••••••"></div>
+    <div class="field"><label>PASSWORD</label><input type="password" id="auth-pass" placeholder="â¢â¢â¢â¢â¢â¢â¢â¢"></div>
 
     <button class="btn-gold" onclick="handleSignIn()">ENTER THE ARENA</button>
 
@@ -280,7 +280,7 @@ html,body{background:var(--bg);overflow:hidden;height:100%;
 
     <div class="player-hud" id="p1-hud">
 
-      <div class="hud-icon" id="p1-icon">🐉</div>
+      <div class="hud-icon" id="p1-icon">ð</div>
 
       <div class="hud-info">
 
@@ -308,7 +308,7 @@ html,body{background:var(--bg);overflow:hidden;height:100%;
 
       </div>
 
-      <div class="hud-icon" id="p2-icon">⚔</div>
+      <div class="hud-icon" id="p2-icon">â</div>
 
     </div>
 
@@ -318,7 +318,7 @@ html,body{background:var(--bg);overflow:hidden;height:100%;
 
     <div id="stage-mount"></div>
 
-    <div id="arena-hud">PAN · ZOOM · MOVE YOUR TOKEN</div>
+    <div id="arena-hud">PAN Â· ZOOM Â· MOVE YOUR TOKEN</div>
 
     <div id="arena-toast"></div>
 
@@ -326,9 +326,9 @@ html,body{background:var(--bg);overflow:hidden;height:100%;
 
       <div class="zbtn" id="btn-zi">+</div>
 
-      <div class="zbtn" id="btn-zo">−</div>
+      <div class="zbtn" id="btn-zo">â</div>
 
-      <div class="zbtn" id="btn-zh" style="font-size:11px">⌂</div>
+      <div class="zbtn" id="btn-zh" style="font-size:11px">â</div>
 
     </div>
 
@@ -336,21 +336,22 @@ html,body{background:var(--bg);overflow:hidden;height:100%;
 
   <div id="arena-panel">
 
-    <div class="panel-btn" onclick="openBattle()">⚔ BATTLE CARDS</div>
+    <div class="panel-btn" onclick="openBattle()">â BATTLE CARDS</div>
 
     <div class="psep"></div>
 
-    <div class="panel-btn on" id="btn-fog" onclick="toggleFog()">◼ FOG ON</div>
+    <div class="panel-btn on" id="btn-fog" onclick="toggleFog()">â¼ FOG ON</div>
 
-    <div class="panel-btn" id="btn-grid" onclick="toggleGrid()">▦ GRID OFF</div>
+    <div class="panel-btn" id="btn-grid" onclick="toggleGrid()">â¦ GRID OFF</div>
 
     <div class="psep"></div>
 
-    <div class="panel-btn" onclick="startPractice()">🥋 PRACTICE MODE</div>
+    <div class="panel-btn" onclick="startPractice()">ð¥ PRACTICE MODE</div>
 
-    <div class="panel-btn" onclick="findMatch()">🔍 FIND MATCH</div>
+    <div class="panel-btn" onclick="findMatch()">ð FIND MATCH</div>
 
-    <div class="panel-btn" onclick="signOut()" style="margin-left:auto">✕ SIGN OUT</div>
+    <a href="index.html" class="panel-btn" style="text-decoration:none">← HOME</a>
+    <div class="panel-btn" onclick="signOut()" style="margin-left:auto">â SIGN OUT</div>
 
   </div>
 
@@ -362,9 +363,9 @@ html,body{background:var(--bg);overflow:hidden;height:100%;
 
     <div class="battle-header">
 
-      <div class="battle-title">⚔ CARD BATTLE</div>
+      <div class="battle-title">â CARD BATTLE</div>
 
-      <div class="battle-close" onclick="closeBattle()">✕</div>
+      <div class="battle-close" onclick="closeBattle()">â</div>
 
     </div>
 
@@ -372,7 +373,7 @@ html,body{background:var(--bg);overflow:hidden;height:100%;
 
       <div class="fighter-side">
 
-        <div class="fighter-icon" id="b-p1-icon">🐉</div>
+        <div class="fighter-icon" id="b-p1-icon">ð</div>
 
         <div class="fighter-name" id="b-p1-name">DRAGON FIST</div>
 
@@ -384,7 +385,7 @@ html,body{background:var(--bg);overflow:hidden;height:100%;
 
       <div class="fighter-side">
 
-        <div class="fighter-icon" id="b-p2-icon">🛡️</div>
+        <div class="fighter-icon" id="b-p2-icon">ð¡ï¸</div>
 
         <div class="fighter-name" id="b-p2-name">IRON GUARD</div>
 
@@ -394,7 +395,7 @@ html,body{background:var(--bg);overflow:hidden;height:100%;
 
     </div>
 
-    <div class="cards-label">YOUR CARDS — TAP TO PLAY</div>
+    <div class="cards-label">YOUR CARDS â TAP TO PLAY</div>
 
     <div class="cards-row" id="cards-row"></div>
 
@@ -422,13 +423,13 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const LOCAL_MASTERS = [
 
-  { id:'dragon', name:'Dragon Fist', description:'Explosive striker', base_health:85, base_attack:15, base_defense:4, icon_url:'🐉' },
+  { id:'dragon', name:'Dragon Fist', description:'Explosive striker', base_health:85, base_attack:15, base_defense:4, icon_url:'ð' },
 
-  { id:'guard',  name:'Iron Guard',  description:'Defensive tank',    base_health:120,base_attack:8,  base_defense:12,icon_url:'🛡️'},
+  { id:'guard',  name:'Iron Guard',  description:'Defensive tank',    base_health:120,base_attack:8,  base_defense:12,icon_url:'ð¡ï¸'},
 
-  { id:'shadow', name:'Swift Shadow',description:'Agile rogue',       base_health:90, base_attack:12, base_defense:6, icon_url:'👤'},
+  { id:'shadow', name:'Swift Shadow',description:'Agile rogue',       base_health:90, base_attack:12, base_defense:6, icon_url:'ð¤'},
 
-  { id:'sage',   name:'Mystic Sage', description:'Spiritual master',  base_health:95, base_attack:10, base_defense:8, icon_url:'🧙'},
+  { id:'sage',   name:'Mystic Sage', description:'Spiritual master',  base_health:95, base_attack:10, base_defense:8, icon_url:'ð§'},
 
 ];
 
@@ -496,7 +497,7 @@ async function handleForgotPassword() {
 
   errEl.style.color='#D4AF37';
 
-  errEl.textContent='Password reset email sent — check your inbox!';
+  errEl.textContent='Password reset email sent â check your inbox!';
 
 }
 
@@ -732,7 +733,7 @@ function buildArenaMap() {
 
   [[2,2],[19,2],[2,11],[19,11]].forEach(([c,r])=>{ layerMap.add(new Konva.Circle({x:c*C+C/2,y:r*C+C/2,radius:8,fill:'rgba(212,175,55,.2)',stroke:'rgba(212,175,55,.4)',strokeWidth:1,listening:false})); });
 
-  layerMap.add(new Konva.Text({x:cx-80,y:cy-8,text:'ARENA — MAP PLACEHOLDER',fontSize:10,fill:'rgba(212,175,55,.2)',fontFamily:'Cinzel,serif',letterSpacing:2,listening:false}));
+  layerMap.add(new Konva.Text({x:cx-80,y:cy-8,text:'ARENA â MAP PLACEHOLDER',fontSize:10,fill:'rgba(212,175,55,.2)',fontFamily:'Cinzel,serif',letterSpacing:2,listening:false}));
 
   layerMap.batchDraw();
 
@@ -792,7 +793,7 @@ function placeTokens() {
 
   layerTokens.add(p1Token); layerTokens.batchDraw();
 
-  p2Token=makeToken(18*C+C/2,8*C+C/2,'⚔','#2980B9','#3498DB',false);
+  p2Token=makeToken(18*C+C/2,8*C+C/2,'â','#2980B9','#3498DB',false);
 
   layerTokens.add(p2Token); layerTokens.batchDraw();
 
@@ -822,7 +823,7 @@ function makeToken(x,y,icon,fill,ring,draggable) {
 
       this.x(nx); this.y(ny); layerTokens.batchDraw(); updatePositionInDB(nx,ny);
 
-      if (p2Token) { const dx=Math.abs(nx-p2Token.x()),dy=Math.abs(ny-p2Token.y()); if(dx<=C*1.5&&dy<=C*1.5) arenaToast('Masters are adjacent — tap BATTLE CARDS!'); }
+      if (p2Token) { const dx=Math.abs(nx-p2Token.x()),dy=Math.abs(ny-p2Token.y()); if(dx<=C*1.5&&dy<=C*1.5) arenaToast('Masters are adjacent â tap BATTLE CARDS!'); }
 
     });
 
@@ -876,9 +877,9 @@ function attachInputs() {
 
 function zoomAt(f){ const ns=Math.max(.2,Math.min(4,view.sc*f)),cx=stage.width()/2,cy=stage.height()/2; view.tx=cx-(cx-view.tx)/view.sc*ns; view.ty=cy-(cy-view.ty)/view.sc*ns; view.sc=ns; applyView(); }
 
-function toggleFog(){ fogEnabled=!fogEnabled; buildFog(); document.getElementById('btn-fog').textContent='◼ FOG '+(fogEnabled?'ON':'OFF'); document.getElementById('btn-fog').classList.toggle('on',fogEnabled); }
+function toggleFog(){ fogEnabled=!fogEnabled; buildFog(); document.getElementById('btn-fog').textContent='â¼ FOG '+(fogEnabled?'ON':'OFF'); document.getElementById('btn-fog').classList.toggle('on',fogEnabled); }
 
-function toggleGrid(){ gridEnabled=!gridEnabled; buildGrid(); document.getElementById('btn-grid').textContent='▦ GRID '+(gridEnabled?'ON':'OFF'); document.getElementById('btn-grid').classList.toggle('on',gridEnabled); }
+function toggleGrid(){ gridEnabled=!gridEnabled; buildGrid(); document.getElementById('btn-grid').textContent='â¦ GRID '+(gridEnabled?'ON':'OFF'); document.getElementById('btn-grid').classList.toggle('on',gridEnabled); }
 
 function startPractice() {
 
@@ -906,7 +907,7 @@ function startPractice() {
 
   buildFog();
 
-  arenaToast('Practice Mode — fighting '+ai.name+'!');
+  arenaToast('Practice Mode â fighting '+ai.name+'!');
 
   document.getElementById('turn-badge').textContent='YOUR TURN';
 
@@ -934,7 +935,7 @@ async function findMatch() {
 
       const { data:sess }=await sb.from('arena_sessions').insert({player1_id:currentUser.id,player1_master_id:chosenMaster?.id||null,status:'active'}).select().single();
 
-      if (sess) { sessionData=sess; myPlayerSlot='player1'; arenaToast('Arena open — waiting for opponent...'); subscribeToSession(sess.id); }
+      if (sess) { sessionData=sess; myPlayerSlot='player1'; arenaToast('Arena open â waiting for opponent...'); subscribeToSession(sess.id); }
 
     }
 
@@ -1048,7 +1049,7 @@ async function playCard(card,el) {
 
     else p2Health=Math.min(100,p2Health+Math.floor(damage/2));
 
-    addBattleLog(`${chosenMaster?.name||'You'} used ${card.name} — restored ${Math.floor(damage/2)} HP!`);
+    addBattleLog(`${chosenMaster?.name||'You'} used ${card.name} â restored ${Math.floor(damage/2)} HP!`);
 
   }
 
@@ -1070,7 +1071,7 @@ async function playCard(card,el) {
 
     const winner=p2Health<=0?(chosenMaster?.name||'You'):'Opponent';
 
-    addBattleLog(`🏆 ${winner} wins the battle!`);
+    addBattleLog(`ð ${winner} wins the battle!`);
 
     arenaToast(winner+' wins!');
 
@@ -1090,7 +1091,7 @@ function addBattleLog(msg) {
 
   entry.className='log-entry';
 
-  entry.innerHTML=`<span>›</span> ${msg}`;
+  entry.innerHTML=`<span>âº</span> ${msg}`;
 
   log.appendChild(entry);
 
